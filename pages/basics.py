@@ -4,6 +4,7 @@ from tkinter import ttk, filedialog
 from PIL import Image, ImageTk
 import cv2 as cv
 import threading
+from ffpyplayer.player import MediaPlayer
 from utils.methods import scale_dim
 
 class FrameReadImage(tk.Frame):
@@ -35,10 +36,21 @@ class FrameReadVideo(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.fname = fname
         self.canvas_main = tk.Canvas(master=self, background=self.CANVAS_BK_COLOR, width=self.CANVAS_SIZE[0], height=self.CANVAS_SIZE[1])
-        self.canvas_main.grid(row=0, column=0, sticky="WENS")
-    
+        self.canvas_main.grid(row=0, columnspan=2, sticky="WENS")
+        self.var_stop_video = tk.BooleanVar(master=self, value=False)
+        self.chkbox_stop_video = ttk.Checkbutton(master=self, text="Stop Video", variable=self.var_stop_video, command=self.btn_stop_video_changed)
+        self.chkbox_stop_video.grid(row=1, column=0, sticky="WE")
+        self.var_mute_video = tk.BooleanVar(master=self, value=False)
+        self.chkbox_mute_video = ttk.Checkbutton(master=self, text="Mute Audio", variable=self.var_mute_video)
+        self.chkbox_mute_video.grid(row=1, column=1, sticky="WE")
+
+    def btn_stop_video_changed(self):
+        stop_video = self.var_stop_video.get()
+        self.var_mute_video.set(stop_video)
+
     def load_video(self):
         self.cap = cv.VideoCapture(str(self.fname))
+        self.player = MediaPlayer(str(self.fname))
         self.video_thread = threading.Thread(target=self.show_video, daemon=True)
         self.video_thread.start()
 
@@ -47,12 +59,24 @@ class FrameReadVideo(tk.Frame):
             success = True
             self.canvas_main.create_rectangle(*self.FIELD_EDGE)
             while success:
-                success, _video = self.cap.read()
-                if success:                    
-                    _video = cv.resize(src=_video, dsize=scale_dim(_video, keep_aspect_ratio=True, fixed_width=160), interpolation=cv.INTER_AREA)
-                    self.video_holder = ImageTk.PhotoImage(Image.fromarray(cv.cvtColor(_video, cv.COLOR_BGR2RGB)))
-                    self.canvas_main.create_image((self.VIDEO_X, self.VIDEO_Y), image=self.video_holder, tag="video", anchor="nw")
-                    cv.waitKey(30)
+                if not self.var_stop_video.get():
+                    success, video = self.cap.read()
+                    audio_frame, val = self.player.get_frame()
+                    if not self.var_mute_video.get():
+                        self.player.set_mute(0)
+                        if audio_frame:
+                            img, t = audio_frame
+                            print(val, t, img.get_pixel_format(), img.get_buffer_size())
+                    else:
+                        self.player.set_mute(1)
+                    if success and audio_frame:                    
+                        video = cv.resize(src=video, dsize=scale_dim(video, keep_aspect_ratio=True, fixed_width=160), interpolation=cv.INTER_AREA)
+                        self.video_holder = ImageTk.PhotoImage(Image.fromarray(cv.cvtColor(video, cv.COLOR_BGR2RGB)))
+                        self.canvas_main.create_image((self.VIDEO_X, self.VIDEO_Y), image=self.video_holder, tag="video", anchor="nw")
+                        cv.waitKey(30)
+                else:
+                    self.player.set_mute(1)
+                    cv.waitKey(0)
         self.load_video() # Repeat showing the video
 
 class FrameLoadImage(tk.Frame):
@@ -67,7 +91,7 @@ class FrameLoadImage(tk.Frame):
         self.canvas_main.grid(row=0, column=0, sticky="WENS")
         self.btn_open = ttk.Button(master=self, text="Open", command=self.load_image)
         self.btn_open.grid(row=1, column=0, sticky="WE")
-    
+
     def load_image(self):
         fname = filedialog.askopenfilename(
             defaultextension="*.jpg",
