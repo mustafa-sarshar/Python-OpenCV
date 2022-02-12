@@ -3,7 +3,8 @@ import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
 from pages.basics import FrameReadImage, FrameReadVideo, FrameLoadImage
-from pages.transformation import FrameManipulateImage, FrameTransformImage, FrameChangeColorSpaceImage, FrameSplitColorChannelsImage
+from pages.transformation import FrameManipulateImage, FrameTransformImage, FrameChangeColorSpaceImage
+from pages.advanced_techniques import FrameSplitColorChannelsImage
 
 # In[] Layout
 class App(tk.Tk):
@@ -21,14 +22,19 @@ class App(tk.Tk):
         self.notebook_main = ttk.Notebook(master=self, padding=self.PADDING_10)
         frm_basics = ttk.Frame(master=self.notebook_main)
         frm_transformation = ttk.Frame(master=self.notebook_main)
+        frm_advanced_techniques = ttk.Frame(master=self.notebook_main)
         self.notebook_main.add(child=frm_basics, text="Basics")
         self.notebook_main.add(child=frm_transformation, text="Transformation")
+        self.notebook_main.add(child=frm_advanced_techniques, text="Advanced Techniques")
 
         self.notebook_basics = ttk.Notebook(master=frm_basics, padding=self.PADDING_10)
         self.notebook_basics.grid(row=0, column=0, sticky="WENS")
 
         self.notebook_transformation = ttk.Notebook(master=frm_transformation, padding=self.PADDING_10)
         self.notebook_transformation.grid(row=0, column=0, sticky="WENS")
+        
+        self.notebook_advanced_techniques = ttk.Notebook(master=frm_advanced_techniques, padding=self.PADDING_10)
+        self.notebook_advanced_techniques.grid(row=0, column=0, sticky="WENS")
 
         self.notebook_main.grid(row=0, column=0, sticky="WENS")
         self.notebook_main.grid_columnconfigure(0, weight=1)
@@ -71,12 +77,12 @@ class App(tk.Tk):
         
         # Split Color Channels of Image Tab
         fname = Path(Path.cwd(), "files", "landscape_3.jpg")
-        frm_color_channels = FrameSplitColorChannelsImage(parent=self.notebook_transformation, fname=fname)
-        self.notebook_transformation.add(child=frm_color_channels, text="Color Channels")
+        frm_color_channels = FrameSplitColorChannelsImage(parent=self.notebook_advanced_techniques, fname=fname)
+        self.notebook_advanced_techniques.add(child=frm_color_channels, text="Color Channels")
         frm_color_channels.load_image()
         
-        self.notebook_main.select(tab_id=1)
-        self.notebook_transformation.select(tab_id=3)
+        self.notebook_main.select(tab_id=2)
+        self.notebook_advanced_techniques.select(tab_id=0)
 
 # In[] App
 if __name__ == "__main__":
