@@ -57,7 +57,7 @@ class App(tk.Tk):
         fname = Path(Path.cwd(), "files", "cat_1.mp4")
         frm_read_video = FrameReadVideo(parent=self.notebook_basics, fname=fname)
         self.notebook_basics.add(child=frm_read_video, text="Read Video")
-        frm_read_video.load_video()
+        # frm_read_video.load_video()
 
         # Load Image Tab
         frm_load_image = FrameLoadImage(parent=self.notebook_basics)
