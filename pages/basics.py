@@ -5,8 +5,6 @@ from PIL import Image, ImageTk
 import cv2 as cv
 import threading
 from ffpyplayer.player import MediaPlayer
-from pyparsing import col
-from sklearn.feature_extraction import image
 from utils.methods import scale_dim
 
 class FrameReadImage(tk.Frame):
@@ -22,6 +20,7 @@ class FrameReadImage(tk.Frame):
         self.canvas_main.grid(row=0, column=0, sticky="WENS")
         
         self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
     def load_image(self):
         _img_cv = cv.imread(str(self.fname), cv.IMREAD_UNCHANGED)
@@ -51,7 +50,8 @@ class FrameReadVideo(tk.Frame):
         self.chkbox_mute_video = ttk.Checkbutton(master=self, text="Mute Audio", variable=self.var_mute_video, state="disabled")
         self.chkbox_mute_video.grid(row=1, column=1, sticky="WE")
         
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure([0, 1], weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
     def btn_stop_video_changed(self):
         stop_video = self.var_stop_video.get()
@@ -104,7 +104,9 @@ class FrameLoadImage(tk.Frame):
         self.btn_open = ttk.Button(master=self, text="Open", command=self.load_image)
         self.btn_open.grid(row=1, column=0, sticky="WE")
         
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)        
+        self.grid_rowconfigure(0, weight=1)
+        self.canvas_main.create_rectangle(10, 10, 100, 100, tag="border")
 
     def load_image(self):
         fname = filedialog.askopenfilename(
@@ -120,150 +122,5 @@ class FrameLoadImage(tk.Frame):
         _img_cv = cv.resize(src=_img_cv, dsize=scale_dim(_img_cv, keep_aspect_ratio=True, fixed_width=160), interpolation=cv.INTER_AREA)
         self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(cv.cvtColor(_img_cv, cv.COLOR_BGR2RGB)))
         self.canvas_main.create_image((self.IMG_X, self.IMG_Y), image=self.imgae_holder, tag="imgae", anchor="nw")
+        self.canvas_main.delete(self.canvas_main.find_withtag("border"))
         self.canvas_main.create_rectangle(*self.FIELD_EDGE)
-
-class FrameManipulateImage(tk.Frame):
-    CANVAS_SIZE = (200, 200)
-    CANVAS_BK_COLOR = "#317001"
-    FIELD_EDGE_NW = (10, 11)
-    IMG_X, IMG_Y = 20, 20
-
-    def __init__(self, parent, fname):
-        tk.Frame.__init__(self, parent)
-        print(self, parent)
-        self.fname = fname
-        self.canvas_main = tk.Canvas(master=self, background=self.CANVAS_BK_COLOR, width=self.CANVAS_SIZE[0], height=self.CANVAS_SIZE[1])
-        self.canvas_main.grid(row=0, column=0, sticky="WENS")
-        self.frm_options = ttk.Frame(master=self)
-        self.frm_options.grid(row=1, column=0)
-        
-        self._init_manipulators()
-        
-        self.grid_columnconfigure(0, weight=1)
-
-    def _init_manipulators(self):
-        self.var_options = tk.StringVar(master=self, value="Normal")
-        rd_option_1 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Reset", value="Reset", command=self.option_changed)
-        rd_option_1.grid(row=0, column=0)
-        rd_option_2 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Gray", value="Gray", command=self.option_changed)
-        rd_option_2.grid(row=0, column=1)
-        rd_option_3 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Blur", value="Blur", command=self.option_changed)
-        rd_option_3.grid(row=0, column=2)
-        rd_option_4 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Edges", value="Edges", command=self.option_changed)
-        rd_option_4.grid(row=1, column=0)
-        rd_option_5 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Dilate", value="Dilate", command=self.option_changed)
-        rd_option_5.grid(row=1, column=1)
-        rd_option_6 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Erode", value="Erode", command=self.option_changed)
-        rd_option_6.grid(row=1, column=2)
-
-    def load_image(self):
-        self.img_cv = cv.imread(str(self.fname), cv.IMREAD_UNCHANGED)
-        self.img_cv = cv.resize(src=self.img_cv, dsize=scale_dim(self.img_cv, keep_aspect_ratio=True, fixed_height=160), interpolation=cv.INTER_AREA)
-        self.img_cv_current = self.img_cv.copy()
-        self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(cv.cvtColor(self.img_cv, cv.COLOR_BGR2RGB)))
-
-        self.canvas_main.create_image((self.IMG_X+self.imgae_holder.width()//2, self.IMG_Y+self.imgae_holder.height()//2), image=self.imgae_holder, tag="image", anchor="center")
-        self.canvas_main.create_rectangle(*self.FIELD_EDGE_NW, self.imgae_holder.width()+30, self.imgae_holder.height()+30)
-
-    def option_changed(self):
-        option = self.var_options.get()
-        img = self.canvas_main.find_withtag("image")
-
-        if option == "Reset":
-            self.img_cv_current = self.img_cv.copy()
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(cv.cvtColor(self.img_cv, cv.COLOR_BGR2RGB)))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Gray":
-            self.img_cv_current = self.img_cv.copy()
-            self.img_cv_current = cv.cvtColor(self.img_cv_current, cv.COLOR_BGR2GRAY)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Blur":
-            self.img_cv_current = cv.GaussianBlur(self.img_cv_current, ksize=(7, 7), sigmaX=cv.BORDER_DEFAULT)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Edges":
-            self.img_cv_current = cv.Canny(self.img_cv_current, threshold1=10, threshold2=175)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Dilate":
-            self.img_cv_current = cv.dilate(self.img_cv_current, kernel=(7, 7), iterations=3)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Erode":
-            self.img_cv_current = cv.erode(self.img_cv_current, kernel=(7, 7), iterations=3)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-
-class FrameTransformImage(tk.Frame):
-    CANVAS_SIZE = (200, 200)
-    CANVAS_BK_COLOR = "#317001"
-    FIELD_EDGE_NW = (10, 11)
-    IMG_X, IMG_Y = 20, 20
-
-    def __init__(self, parent, fname):
-        tk.Frame.__init__(self, parent)
-        print(self, parent)
-        self.fname = fname
-        self.canvas_main = tk.Canvas(master=self, background=self.CANVAS_BK_COLOR, width=self.CANVAS_SIZE[0], height=self.CANVAS_SIZE[1])
-        self.canvas_main.grid(row=0, column=0, sticky="WENS")
-        self.frm_options = ttk.Frame(master=self)
-        self.frm_options.grid(row=1, column=0)
-
-        self._init_transformers()
-
-        self.grid_columnconfigure(0, weight=1)
-
-    def _init_transformers(self):
-        self.var_options = tk.StringVar(master=self, value="Normal")
-        rd_option_1 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Reset", value="Reset", command=self.option_changed)
-        rd_option_1.grid(row=0, column=0)
-        rd_option_2 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Gray", value="Gray", command=self.option_changed)
-        rd_option_2.grid(row=0, column=1)
-        rd_option_3 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Blur", value="Blur", command=self.option_changed)
-        rd_option_3.grid(row=0, column=2)
-        rd_option_4 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Edges", value="Edges", command=self.option_changed)
-        rd_option_4.grid(row=1, column=0)
-        rd_option_5 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Dilate", value="Dilate", command=self.option_changed)
-        rd_option_5.grid(row=1, column=1)
-        rd_option_6 = ttk.Radiobutton(master=self.frm_options, variable=self.var_options, text="Erode", value="Erode", command=self.option_changed)
-        rd_option_6.grid(row=1, column=2)
-
-    def load_image(self):
-        self.img_cv = cv.imread(str(self.fname), cv.IMREAD_UNCHANGED)
-        self.img_cv = cv.resize(src=self.img_cv, dsize=scale_dim(self.img_cv, keep_aspect_ratio=True, fixed_height=160), interpolation=cv.INTER_AREA)
-        self.img_cv_current = self.img_cv.copy()
-        self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(cv.cvtColor(self.img_cv, cv.COLOR_BGR2RGB)))
-
-        self.canvas_main.create_image((self.IMG_X+self.imgae_holder.width()//2, self.IMG_Y+self.imgae_holder.height()//2), image=self.imgae_holder, tag="image", anchor="center")
-        self.canvas_main.create_rectangle(*self.FIELD_EDGE_NW, self.imgae_holder.width()+30, self.imgae_holder.height()+30)
-
-    def option_changed(self):
-        option = self.var_options.get()
-        img = self.canvas_main.find_withtag("image")
-
-        if option == "Reset":
-            self.img_cv_current = self.img_cv.copy()
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(cv.cvtColor(self.img_cv, cv.COLOR_BGR2RGB)))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Gray":
-            self.img_cv_current = self.img_cv.copy()
-            self.img_cv_current = cv.cvtColor(self.img_cv_current, cv.COLOR_BGR2GRAY)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Blur":
-            self.img_cv_current = cv.GaussianBlur(self.img_cv_current, ksize=(7, 7), sigmaX=cv.BORDER_DEFAULT)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Edges":
-            self.img_cv_current = cv.Canny(self.img_cv_current, threshold1=10, threshold2=175)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Dilate":
-            self.img_cv_current = cv.dilate(self.img_cv_current, kernel=(7, 7), iterations=3)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
-        elif option == "Erode":
-            self.img_cv_current = cv.erode(self.img_cv_current, kernel=(7, 7), iterations=3)
-            self.imgae_holder = ImageTk.PhotoImage(Image.fromarray(self.img_cv_current))
-            self.canvas_main.itemconfigure(img, image=self.imgae_holder)
