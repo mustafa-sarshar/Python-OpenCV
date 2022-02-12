@@ -4,7 +4,8 @@ from tkinter import ttk
 from pathlib import Path
 from pages.basics import FrameReadImage, FrameReadVideo, FrameLoadImage
 from pages.transformation import FrameManipulateImage, FrameTransformImage, FrameChangeColorSpaceImage
-from pages.advanced_techniques import FrameSplitColorChannelsImage
+from pages.advanced_techniques import FrameSplitColorChannelsImage, FrameBlurImage, FrameMaskingImage
+from pages.analyse_image import FrameHistogramImage
 
 # In[] Layout
 class App(tk.Tk):
@@ -23,9 +24,11 @@ class App(tk.Tk):
         frm_basics = ttk.Frame(master=self.notebook_main)
         frm_transformation = ttk.Frame(master=self.notebook_main)
         frm_advanced_techniques = ttk.Frame(master=self.notebook_main)
+        frm_analyse_image = ttk.Frame(master=self.notebook_main)
         self.notebook_main.add(child=frm_basics, text="Basics")
         self.notebook_main.add(child=frm_transformation, text="Transformation")
         self.notebook_main.add(child=frm_advanced_techniques, text="Advanced Techniques")
+        self.notebook_main.add(child=frm_analyse_image, text="Analyse Image")
 
         self.notebook_basics = ttk.Notebook(master=frm_basics, padding=self.PADDING_10)
         self.notebook_basics.grid(row=0, column=0, sticky="WENS")
@@ -35,6 +38,9 @@ class App(tk.Tk):
         
         self.notebook_advanced_techniques = ttk.Notebook(master=frm_advanced_techniques, padding=self.PADDING_10)
         self.notebook_advanced_techniques.grid(row=0, column=0, sticky="WENS")
+        
+        self.notebook_analyse_image = ttk.Notebook(master=frm_analyse_image, padding=self.PADDING_10)
+        self.notebook_analyse_image.grid(row=0, column=0, sticky="WENS")
 
         self.notebook_main.grid(row=0, column=0, sticky="WENS")
         self.notebook_main.grid_columnconfigure(0, weight=1)
@@ -81,8 +87,24 @@ class App(tk.Tk):
         self.notebook_advanced_techniques.add(child=frm_color_channels, text="Color Channels")
         frm_color_channels.load_image()
         
+        # Blur Image Tab
+        fname = Path(Path.cwd(), "files", "landscape_1.jpg")
+        frm_blur_image = FrameBlurImage(parent=self.notebook_advanced_techniques, fname=fname)
+        self.notebook_advanced_techniques.add(child=frm_blur_image, text="Blur Image")
+        frm_blur_image.load_image()
+        
+        # Masking Image Tab
+        fname = Path(Path.cwd(), "files", "cat_1.png")
+        frm_masking_image = FrameMaskingImage(parent=self.notebook_advanced_techniques, fname=fname)
+        self.notebook_advanced_techniques.add(child=frm_masking_image, text="Masking Image")
+        frm_masking_image.load_image()
+        
+        # Histogram Image Tab
+        frm_histogram_image = FrameHistogramImage(parent=self.notebook_analyse_image)
+        self.notebook_analyse_image.add(child=frm_histogram_image, text="Histogram Image")
+        
         self.notebook_main.select(tab_id=2)
-        self.notebook_advanced_techniques.select(tab_id=0)
+        self.notebook_advanced_techniques.select(tab_id=2)
 
 # In[] App
 if __name__ == "__main__":
