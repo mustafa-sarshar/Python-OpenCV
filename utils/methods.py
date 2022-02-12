@@ -1,4 +1,7 @@
 def scale_dim(img, scale_factor=0.5, keep_aspect_ratio=False, fixed_height=None, fixed_width=None):
+    """
+    This method works for video, image and live video as well.
+    """
     width = int(img.shape[1] * scale_factor)
     height = int(img.shape[0] * scale_factor)
     
