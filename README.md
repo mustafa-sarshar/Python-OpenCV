@@ -5,3 +5,6 @@ The goal is to apply most common and useful manipulation methods for images and 
 
 ### Photos are downloaded from:
 * https://pixabay.com/
+
+### This Repository is inspired by:
+* https://www.youtube.com/watch?v=oXlwWbU8l2o&t=950s

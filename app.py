@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from pathlib import Path
 from pages.basics import FrameReadImage, FrameReadVideo, FrameLoadImage
-from pages.transformation import FrameManipulateImage, FrameTransformImage, FrameChangeColorSpaceImage
+from pages.transformation import FrameManipulateImage, FrameTransformImage, FrameChangeColorSpaceImage, FrameSplitColorChannelsImage
 
 # In[] Layout
 class App(tk.Tk):
@@ -69,8 +69,14 @@ class App(tk.Tk):
         self.notebook_transformation.add(child=frm_color_spaces, text="Color Spaces")
         frm_color_spaces.load_image()
         
+        # Split Color Channels of Image Tab
+        fname = Path(Path.cwd(), "files", "landscape_3.jpg")
+        frm_color_channels = FrameSplitColorChannelsImage(parent=self.notebook_transformation, fname=fname)
+        self.notebook_transformation.add(child=frm_color_channels, text="Color Channels")
+        frm_color_channels.load_image()
+        
         self.notebook_main.select(tab_id=1)
-        self.notebook_transformation.select(tab_id=2)
+        self.notebook_transformation.select(tab_id=3)
 
 # In[] App
 if __name__ == "__main__":

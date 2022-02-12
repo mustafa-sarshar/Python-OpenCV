@@ -106,7 +106,7 @@ class FrameLoadImage(tk.Frame):
         
         self.grid_columnconfigure(0, weight=1)        
         self.grid_rowconfigure(0, weight=1)
-        self.canvas_main.create_rectangle(10, 10, 100, 100, tag="border")
+        self.canvas_main.create_rectangle(*self.FIELD_EDGE, tag="border")
 
     def load_image(self):
         fname = filedialog.askopenfilename(
