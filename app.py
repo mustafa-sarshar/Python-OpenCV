@@ -5,7 +5,8 @@ from pathlib import Path
 from pages.basics import FrameReadImage, FrameReadVideo, FrameLoadImage
 from pages.transformation import FrameManipulateImage, FrameTransformImage, FrameChangeColorSpaceImage
 from pages.advanced_techniques import FrameSplitColorChannelsImage, FrameBlurImage, FrameMaskingImage
-from pages.analyse_image import FrameHistogramImage
+from pages.analyse_image import FrameHistogramImage, FrameThresholdingImage
+from utils import set_dpi_awareness
 
 # In[] Layout
 class App(tk.Tk):
@@ -103,11 +104,18 @@ class App(tk.Tk):
         frm_histogram_image = FrameHistogramImage(parent=self.notebook_analyse_image)
         self.notebook_analyse_image.add(child=frm_histogram_image, text="Histogram Image")
         
-        self.notebook_main.select(tab_id=2)
+        # Histogram Image Tab
+        frm_thresholding_image = FrameThresholdingImage(parent=self.notebook_analyse_image)
+        self.notebook_analyse_image.add(child=frm_thresholding_image, text="Thresholding Image")
+        
+        self.notebook_main.select(tab_id=3)
         self.notebook_advanced_techniques.select(tab_id=2)
+        
+        
 
 # In[] App
 if __name__ == "__main__":
+    set_dpi_awareness()
     app = App()
     app.grid_columnconfigure(0, weight=1)
     app.mainloop()
