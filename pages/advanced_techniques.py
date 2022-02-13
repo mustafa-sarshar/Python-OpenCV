@@ -176,9 +176,9 @@ class FrameMaskingImage(tk.Frame):
         self.canvas_main.create_rectangle(self.FIELD_EDGE_NW[0], self.FIELD_EDGE_NW[1]+self.img_holder.height()+30, self.img_holder.width()+30, (self.img_holder.height()+30)*2)
 
         self.img_result = self.img_cv.copy()
-        self.img_result_holder = ImageTk.PhotoImage(Image.fromarray(self.img_result))
-        self.canvas_main.create_image(200, 125, image=self.img_result_holder, tag="result", anchor="center")
-        self.canvas_main.create_rectangle(150, 75, 145+self.img_result_holder.width()+25, 75+self.img_result_holder.height()+20)
+        self.img_holder_result = ImageTk.PhotoImage(Image.fromarray(self.img_result))
+        self.canvas_main.create_image(200, 125, image=self.img_holder_result, tag="result", anchor="center")
+        self.canvas_main.create_rectangle(150, 75, 145+self.img_holder_result.width()+25, 75+self.img_holder_result.height()+20)
 
     def option_changed(self):
         option = self.var_options.get()
@@ -198,5 +198,5 @@ class FrameMaskingImage(tk.Frame):
         else:
             return
 
-        self.img_result_holder = ImageTk.PhotoImage(Image.fromarray(self.img_result))
-        self.canvas_main.itemconfigure(img, image=self.img_result_holder)
+        self.img_holder_result = ImageTk.PhotoImage(Image.fromarray(self.img_result))
+        self.canvas_main.itemconfigure(img, image=self.img_holder_result)
