@@ -111,7 +111,6 @@ class App(tk.Tk):
         self.notebook_main.select(tab_id=3)
         self.notebook_advanced_techniques.select(tab_id=2)
 
-
 # In[] App
 if __name__ == "__main__":
     set_dpi_awareness()
