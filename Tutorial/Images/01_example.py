@@ -12,4 +12,3 @@ cv.imshow("Display window", img)
 k = cv.waitKey(0)
 if k == ord("s"):
     cv.imwrite("starry_night.png", img)
-
