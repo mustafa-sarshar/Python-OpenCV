@@ -35,7 +35,7 @@ for img_0, img_1 in zip(images_0, images_1):
 
     # If found, add object points, image points (after refining them)
     if ret_0 and ret_1:        
-        print("# of corners froun:")
+        print("# of corners found:")
         print(f"{img_0} ({len(corners_0)}) - {img_1} ({len(corners_1)})\n")
         
         obj_points.append(objp)

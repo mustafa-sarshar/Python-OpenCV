@@ -10,13 +10,20 @@ class CameraObject:
         self.camera_settings = camera_settings
     
     def init_camera(self):
-        self.camera = cv.VideoCapture(self.camera_id)
-        if self.camera.isOpened():
-            self.set_camera_frame_size(self.camera)
+        try:
+            self.camera = cv.VideoCapture(self.camera_id)            
+            if self.camera.isOpened():
+                self.update_camera_frame_size()
+                return True
+            else:
+                return False
+        except Exception as e:
+            print("Error raised: ", e)
     
-    def set_camera_frame_size(self):
-        self.camera.set(cv.CAP_PROP_FRAME_WIDTH, self.camera_settings.camera_frame_size[0])
-        self.camera.set(cv.CAP_PROP_FRAME_HEIGHT, self.camera_settings.camera_frame_size[1])
+    def update_camera_frame_size(self):
+        width, height = self.camera_settings.get_frame_size()
+        self.camera.set(cv.CAP_PROP_FRAME_WIDTH, width)
+        self.camera.set(cv.CAP_PROP_FRAME_HEIGHT, height)
     
     def get_camera_settings(self):
         for setting in self.camera_settings:

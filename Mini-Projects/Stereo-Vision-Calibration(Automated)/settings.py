@@ -1,8 +1,9 @@
+from typing import Tuple
 import cv2 as cv
 
-CAMERA_FRAME_SIZE = (320, 240)      # in pixels (width, height)
-CHESSBOARD_SIZE = (7, 7)
-CHESSBOARD_SQUARES_SIZE = 22  # mm
+CAMERA_FRAME_SIZE = (640, 480)
+CHESSBOARD_SIZE = (9, 6)
+CHESSBOARD_SQUARES_SIZE = 30  # mm
 
 # termination criteria
 TERMINATION_CRITERIA = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -34,5 +35,22 @@ CV2_INTERPOLATION_METHODS = dict(
 )
 
 class CameraSettings:
-    camera_frame_size = (320, 240)  # pixel
-    camera_focal_length = 10        # mm
+
+    default_frame_size = (320, 240)     # pixel
+    default_focal_length = 10           # mm
+
+    def __init__(self, frame_size:Tuple=default_frame_size, focal_length:int=default_focal_length, *args, **kwargs):
+        self.frame_size = frame_size
+        self.focal_length = focal_length
+    
+    def get_frame_size(self):
+        return self.frame_size
+    
+    def show_settings(self):
+        print("Camera is set to:")
+        print("\t1) Frame size", self.frame_size)
+        print("\t2) Focal length", self.focal_length)
+    
+    def reset_settings_to_default(self):
+        self.frame_size = CameraSettings.default_frame_size
+        self.focal_length = CameraSettings.default_focal_length

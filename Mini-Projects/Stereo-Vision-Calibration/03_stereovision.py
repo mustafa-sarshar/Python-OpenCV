@@ -63,7 +63,6 @@ while(cap_0.isOpened() and cap_1.isOpened()):
     if cv.waitKey(1) & 0xFF == ord("q"):
         break
 
-
 # Release and destroy all windows before termination
 cap_0.release()
 cap_1.release()
